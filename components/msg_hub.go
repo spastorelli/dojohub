@@ -20,16 +20,22 @@ var defaultUpgrader = websocket.Upgrader{
 	CheckOrigin:     validateJWT,
 }
 
+const (
+	Terminated = iota - 1
+	Stopped
+	Running
+)
+
 // MsgHub handles the websocket connections to the DojoHub.
 type MsgHub struct {
-	running  bool
+	status   int
 	channels map[string]*channel
 }
 
 // NewMsgHub creates a MsgHub.
 func NewMsgHub() *MsgHub {
 	return &MsgHub{
-		running:  false,
+		status:   Stopped,
 		channels: make(map[string]*channel),
 	}
 }
@@ -37,14 +43,15 @@ func NewMsgHub() *MsgHub {
 // Run starts the channels for the registered DojoHub apps.
 func (h *MsgHub) Run() {
 	channel := newChannel(TestTopic)
-	go channel.Serve()
+	channel.Serve()
+
 	h.channels[channel.topic] = channel
-	h.running = true
+	h.status = Running
 }
 
 // ServeHTTP handles websocket connections to the Message Hub.
 func (h *MsgHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !h.running {
+	if Running != h.status {
 		glog.Fatal("Dojo MessageHub is not running, can't serve requests.")
 	}
 	ws, err := defaultUpgrader.Upgrade(w, r, nil)
@@ -63,16 +70,19 @@ func (h *MsgHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO(spastorelli): Get the topic value from the JWT.
-	hub, ok := h.channels[TestTopic]
+	channel, ok := h.channels[TestTopic]
 	if !ok {
-		glog.Error("Could not find the topic for the connection")
+		glog.Error("Could not find the topic for the connection.")
 		return
 	}
 
-	conn := newClient(clientId, hub.publish, ws)
-	hub.subscribe <- conn
-	go conn.handleOutbound()
-	go conn.handleInbound()
+	client := newClient(clientId, channel.publish, ws)
+	channel.subscribe <- client
+	if !(<-client.subscribed) {
+		glog.Error("Could not subscribe client.")
+	}
+	go client.handleOutbound()
+	go client.handleInbound()
 }
 
 // channel handles messages that are published to its associated topic by
@@ -81,8 +91,10 @@ type channel struct {
 	topic       string
 	subscribers map[string]*client
 	subscribe   chan *client
+	subAck      chan bool
 	unSubscribe chan *client
 	publish     chan *clientMsg
+	terminate   chan bool
 }
 
 // newChannel returns a new channel initialized with the provided topic.
@@ -91,8 +103,10 @@ func newChannel(t string) *channel {
 		topic:       t,
 		subscribers: make(map[string]*client),
 		subscribe:   make(chan *client),
+		subAck:      make(chan bool),
 		unSubscribe: make(chan *client),
 		publish:     make(chan *clientMsg, 256),
+		terminate:   make(chan bool),
 	}
 }
 
@@ -104,7 +118,7 @@ func (ch *channel) addSubscriber(client *client) {
 // removeSubscriber removes the provided client from the map of subscribers, closing
 // the client SendToClient go channel.
 func (ch *channel) removeSubscriber(client *client) {
-	if _, ok := ch.subscribers[client.id]; ok {
+	if _, ok := ch.subscribers[client.id]; !ok {
 		glog.Infof("Client %s is not subscribed to the Topic %s", client.id, ch.topic)
 		return
 	}
@@ -114,20 +128,44 @@ func (ch *channel) removeSubscriber(client *client) {
 
 // Serve starts the channel to handles its messages and subscribers.
 func (ch *channel) Serve() {
-	for {
-		select {
-		case client := <-ch.subscribe:
-			ch.addSubscriber(client)
-		case client := <-ch.unSubscribe:
-			ch.removeSubscriber(client)
-		case msg := <-ch.publish:
-			for _, client := range ch.subscribers {
-				if client.id != msg.clientId {
-					client.sendToClient <- msg
+	go func() {
+		for {
+			select {
+			case client := <-ch.subscribe:
+				ch.addSubscriber(client)
+				client.subscribed <- true
+			case client := <-ch.unSubscribe:
+				ch.removeSubscriber(client)
+				client.subscribed <- false
+			case msg := <-ch.publish:
+				for _, client := range ch.subscribers {
+					if client.id != msg.clientId {
+						client.sendToClient <- msg
+					}
 				}
+			case <-ch.terminate:
+				ch.Terminate()
+				break
 			}
 		}
+	}()
+}
+
+// Terminate terminates the channel.
+func (ch *channel) Terminate() {
+	for _, client := range ch.subscribers {
+		ch.removeSubscriber(client)
 	}
+}
+
+// wsConn is a websocket connection.
+//
+// Defining an interface that replicates the websocket.Conn type for testing purposes,
+// since no Conn interface are defined in the gorilla/websocket package and there are
+// no plans in defining one: https://github.com/gorilla/websocket/issues/74
+type wsConn interface {
+	WriteMessage(msgType int, data []byte) (err error)
+	ReadMessage() (msgType int, payload []byte, err error)
 }
 
 // clientMsg wraps a websocket connection message for a given client.
@@ -139,18 +177,20 @@ type clientMsg struct {
 // client handles inbound and outbound messages of an underlying websocket connection.
 type client struct {
 	id               string
-	ws               *websocket.Conn
+	ws               wsConn
 	publishToChannel chan *clientMsg
 	sendToClient     chan *clientMsg
+	subscribed       chan bool
 }
 
 // NewClient creates a new client for a given id, channel and websocket connection.
-func newClient(id string, pub chan *clientMsg, ws *websocket.Conn) *client {
+func newClient(id string, pub chan *clientMsg, ws wsConn) *client {
 	return &client{
 		id:               id,
 		ws:               ws,
 		publishToChannel: pub,
 		sendToClient:     make(chan *clientMsg, 256),
+		subscribed:       make(chan bool),
 	}
 }
 
