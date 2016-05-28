@@ -1,60 +1,114 @@
 package components
 
 import (
+	"encoding/base64"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
 
-// TODO(spastorelli): Remove when multiple topics are supported.
-const TestTopic = "Test"
-
-func validateJWT(r *http.Request) bool {
-	// TODO(spastorelli): Implement the origin check of the websocket connection using JWT.
-	return true
-}
-
-var defaultUpgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     validateJWT,
-}
+type Status int8
 
 const (
-	Terminated = iota - 1
+	Terminated Status = iota - 1
 	Stopped
 	Running
 )
 
 // MsgHub handles the websocket connections to the DojoHub.
 type MsgHub struct {
-	status   int
-	channels map[string]*channel
+	status     Status
+	apps       map[string]*Application
+	wsUpgrader websocket.Upgrader
 }
 
 // NewMsgHub creates a MsgHub.
 func NewMsgHub() *MsgHub {
-	return &MsgHub{
-		status:   Stopped,
-		channels: make(map[string]*channel),
+	hub := &MsgHub{
+		status: Stopped,
+		apps:   make(map[string]*Application),
 	}
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin:     hub.validateClient,
+	}
+	hub.wsUpgrader = upgrader
+	return hub
 }
 
-// Run starts the channels for the registered DojoHub apps.
-func (h *MsgHub) Run() {
-	channel := newChannel(TestTopic)
-	channel.Serve()
+// validationKey returns the application secret key to validate the JWT token.
+func (h *MsgHub) validationKey(token *jwt.Token) (key interface{}, err error) {
+	// TODO(spastorelli): Define specific token validation errors.
+	if jwt.SigningMethodHS256.Alg() != token.Header["alg"] {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
 
-	h.channels[channel.topic] = channel
+	claimedAppId, ok := token.Claims["aud"].(string)
+	if !ok {
+		return nil, fmt.Errorf("No Application Id found in the token claims.")
+	}
+
+	app, ok := h.apps[claimedAppId]
+	if !ok {
+		return nil, fmt.Errorf("No corresponding Application found.")
+	}
+
+	return app.Secret()
+}
+
+// validateClient validates the client's JWT token,
+func (h *MsgHub) validateClient(r *http.Request) bool {
+	if err := r.ParseForm(); err != nil {
+		glog.Errorf("Error while parsing the request parameters: %v", err)
+		return false
+	}
+
+	token := r.Form.Get("t")
+	if token == "" {
+		glog.Error("Could not retrieve the token from request.")
+		return false
+	}
+
+	parsedToken, err := jwt.Parse(token, h.validationKey)
+	if err != nil {
+		glog.Errorf("Error while validating the token: %v", err)
+		return false
+	}
+
+	if parsedToken.Valid {
+		cId := parsedToken.Claims["sub"].(string)
+		appId := parsedToken.Claims["aud"].(string)
+		// TODO(spastorelli): sub value has the format provider|user_id. Strip provider.
+		r.Form.Set("cid", cId)
+		r.Form.Set("aid", appId)
+		return true
+	}
+
+	return false
+}
+
+// RegisterApplication registers an application with the MsgHub.
+func (h *MsgHub) RegisterApplication(app *Application) {
+	h.apps[app.Id] = app
+}
+
+// Run starts the channels for the registered applications.
+func (h *MsgHub) Run() {
+	for _, app := range h.apps {
+		app.Serve()
+	}
 	h.status = Running
 }
 
-// ServeHTTP handles websocket connections to the Message Hub.
+// ServeHTTP handles websocket client connections to the Message Hub.
 func (h *MsgHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if Running != h.status {
 		glog.Fatal("Dojo MessageHub is not running, can't serve requests.")
 	}
-	ws, err := defaultUpgrader.Upgrade(w, r, nil)
+	ws, err := h.wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		glog.Errorf("Error while upgrading to websocket connection: %v\n", err)
 		return
@@ -65,24 +119,50 @@ func (h *MsgHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clientId := r.Form.Get("cid")
-	if clientId == "" {
-		glog.Error("Could not get the clientId")
+	appId := r.Form.Get("aid")
+	if clientId == "" || appId == "" {
+		glog.Error("Could not get the client or application Id.")
 	}
 
-	// TODO(spastorelli): Get the topic value from the JWT.
-	channel, ok := h.channels[TestTopic]
+	app, ok := h.apps[appId]
 	if !ok {
-		glog.Error("Could not find the topic for the connection.")
+		glog.Error("Could not find an Application to connect the client to.")
 		return
 	}
 
-	client := newClient(clientId, channel.publish, ws)
-	channel.subscribe <- client
+	client := newClient(clientId, app.Channel.publish, ws)
+	app.Channel.subscribe <- client
 	if !(<-client.subscribed) {
 		glog.Error("Could not subscribe client.")
 	}
 	go client.handleOutbound()
 	go client.handleInbound()
+}
+
+// Application defines a DojoHub application.
+type Application struct {
+	Id           string
+	Name         string
+	b64EncSecret string
+	Channel      *channel
+	status       Status
+}
+
+// NewApplication creates a new Application instance.
+func NewApplication(id string, name string, encSecret string) *Application {
+	ch := newChannel(id)
+	return &Application{id, name, encSecret, ch, Stopped}
+}
+
+// Serve start the application's channel to handle clients requests.
+func (a *Application) Serve() {
+	a.Channel.Serve()
+	a.status = Running
+}
+
+// Secret returns the application decoded secret.
+func (a *Application) Secret() (key []byte, err error) {
+	return base64.URLEncoding.DecodeString(a.b64EncSecret)
 }
 
 // channel handles messages that are published to its associated topic by
