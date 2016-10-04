@@ -2,23 +2,18 @@
  * The chat application.
  *
  * @param {string} host The websocket server hostname.
- * @param {string} clientId The websocket client id.
+ * @param {string} appClientId The application client id.
  * @param {string} chatElemId The ID of element that holds the
  *      DOM for chat application.
  *
  * @constructor
  */
-var ChatApp = function(host, clientId, chatElemId) {
-    if (!('WebSocket' in window)) {
-        throw 'WebSocket are not supported in this browser.';
-    }
-
-    this.wsConn_ = null;
-    this.wsUrl_ = 'ws://' + host + '/ws/?cid=' + clientId;
+var ChatApp = function(host, appClientId, chatElemId) {
     var chatDom = $('#' + chatElemId);
     this.chatConvElem_ = chatDom.find('#chat-conv')[0];
     this.chatForm_ = chatDom.find('#chat-form');
     this.chatMsg_ = this.chatForm_.find('#chat-msg');
+    this.appClient_ = new coderdojo.dojohub.AppClient(host, appClientId);
 };
 
 
@@ -28,18 +23,9 @@ var ChatApp = function(host, clientId, chatElemId) {
 ChatApp.prototype.start = function() {
       this.chatMsg_.keypress(this.onEnterKeyPress_.bind(this));
       this.chatForm_.submit(this.onFormSubmit_.bind(this));
-      this.initWebSocket_();
-};
-
-
-/**
- * Initializes the web socket connection.
- * @private
- */
-ChatApp.prototype.initWebSocket_ = function() {
-    this.wsConn_ = new WebSocket(this.wsUrl_);
-    this.wsConn_.onclose = this.onWsClose_.bind(this);
-    this.wsConn_.onmessage = this.onWsMessage_.bind(this);
+      this.appClient_.onClose = this.onWsClose_.bind(this);
+      this.appClient_.onMessage = this.onWsMessage_.bind(this);
+      this.appClient_.connect();
 };
 
 
@@ -64,10 +50,10 @@ ChatApp.prototype.onEnterKeyPress_ = function(keyEvent) {
  */
 ChatApp.prototype.onFormSubmit_ = function() {
     var msgData = this.chatMsg_.val();
-    if (!this.wsConn_ || !msgData) {
+    if (this.appClient_.isClosed() || !msgData) {
         return false;
     }
-    this.wsConn_.send(msgData);
+    this.appClient_.send(msgData);
     this.updateChat_(msgData, /** opt_incoming */ false);
     this.chatMsg_.val('');
     return false;
