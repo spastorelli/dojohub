@@ -16,9 +16,10 @@ const cleanTask = require(path.join(config.taskDir, 'clean'));
 const tsLintTask = require(path.join(config.taskDir, 'tslint'));
 const compileTask = require(path.join(config.taskDir, 'compile'));
 const buildTask = require(path.join(config.taskDir, 'build'));
+const minifyTask = require(path.join(config.taskDir, 'minify'));
 
 gulp.task('clean', cleanTask(gulp, config));
 gulp.task('compile', ['clean'], compileTask(gulp, path, config));
 gulp.task('tslint', tsLintTask(gulp, config));
 gulp.task('build', ['compile'], buildTask(gulp, path, config));
-gulp.task('build:min', ['compile'], buildTask(gulp, path, config, /** minify */ true));
+gulp.task('build:min', ['build'], minifyTask(gulp, path, config));
