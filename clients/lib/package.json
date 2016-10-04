@@ -1,0 +1,26 @@
+{
+  "name": "dojohub",
+  "description": "DojoHub application client library",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:spastorelli/dojohub.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "auth0-lock": "^10.4.0",
+    "browserify": "~13.1.0",
+    "del": "~2.2.0",
+    "globby": "6.0.0",
+    "gulp": "~3.9.1",
+    "gulp-tslint": "~5.0.0",
+    "gulp-typescript": "~3.0.1",
+    "gulp-uglify": "~2.0.0",
+    "tslint": "~3.10.1",
+    "typescript": "~2.0.3",
+    "vinyl-buffer": "~1.0.0",
+    "vinyl-source-stream": "~1.1.0"
+  },
+  "scripts": {
+    "postinstall": "echo 'Installation Done!'"
+  }
+}

@@ -1,3 +1,6 @@
 \.*.swp
 \.DS_Store
 data/**
+clients/lib/dist/**
+clients/lib/src/out/**
+clients/lib/node_modules/**
