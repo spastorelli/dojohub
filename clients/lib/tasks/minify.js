@@ -11,13 +11,13 @@ module.exports = (gulp, path, config) => () => {
     compress: {
       sequences: true,
       properties: true,
-  		dead_code: true,
-  		conditionals: true,
-  		booleans: true,
-  		unused: true,
-  		if_return: true,
-  		join_vars: true,
-  		drop_console: true
+      dead_code: true,
+      conditionals: true,
+      booleans: true,
+      unused: true,
+      if_return: true,
+      join_vars: true,
+      drop_console: true
   	}
   });
   return fs.writeFileSync(minfiedJsFile, minfiedJs.code);
