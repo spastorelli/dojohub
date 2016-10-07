@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/golang/glog"
-	"github.com/spastorelli/dojohub/components"
+	"github.com/spastorelli/dojohub/app/components"
 	"net/http"
 	"os"
 	"os/signal"
