@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/golang/glog"
+	"github.com/spastorelli/dojohub/components"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,6 +15,7 @@ import (
 var (
 	host                           string
 	port                           int
+	staticDir                      string
 	tlsCertFile, tlsPrivateKeyFile string
 )
 
@@ -38,6 +40,7 @@ func handleTermination() {
 func init() {
 	flag.IntVar(&port, "port", 8080, "HTTP server port")
 	flag.StringVar(&host, "host", "127.0.0.1", "HTTP server host")
+	flag.StringVar(&staticDir, "staticDir", "static/", "The static files directories")
 	flag.StringVar(
 		&tlsCertFile, "tlsCertFile", "",
 		"The file that contains the TLS/SSL certificate for the server.")
@@ -50,7 +53,7 @@ func main() {
 	flag.Parse()
 	handleTermination()
 
-	app := NewAppServer(&host, &port, &tlsCertFile, &tlsPrivateKeyFile)
+	app := components.NewAppServer(&host, &port, &staticDir, &tlsCertFile, &tlsPrivateKeyFile)
 	app.RegisterHandler("/", http.HandlerFunc(fakeHandler))
 
 	if err := app.Serve(); err != nil {
