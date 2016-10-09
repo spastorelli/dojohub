@@ -48,9 +48,19 @@ func main() {
 	flag.Parse()
 	handleTermination()
 
+	chatExampleApp := components.NewApplication(
+		"<APP_ID>",
+		"ChatExampleApp",
+		"<APP_SECRET>",
+	)
+	msgHub := components.NewMsgHub()
+	msgHub.RegisterApplication(chatExampleApp)
+	msgHub.Run()
+
 	app := components.NewAppServer(&host, &port, &staticDir, &tlsCertFile, &tlsPrivateKeyFile)
 	app.RegisterHandler("/", http.HandlerFunc(handlers.Home))
 	app.RegisterHandler("/example/chat/", http.HandlerFunc(handlers.ExampleChat))
+	app.RegisterHandler("/ws/", msgHub)
 
 	if err := app.Serve(); err != nil {
 		glog.Error("Error while starting the DojoHub: ", err)
