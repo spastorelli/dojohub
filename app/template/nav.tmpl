@@ -1,0 +1,20 @@
+{{define "nav"}}
+<div class="dojohub-navigation-container">
+  <nav class="dojohub-navigation mdl-navigation">
+    <a class="mdl-navigation__link mdl-typography--text-uppercase" href="#"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+    <a class="mdl-navigation__link mdl-typography--text-uppercase" href="http://lptcdojo.com">Dojo Website</a>
+    <a class="mdl-navigation__link mdl-typography--text-uppercase" href="/example/chat/">Examples</a>
+    <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Projects</a>
+  </nav>
+</div>
+<span class="dojohub-mobile-title mdl-layout-title">
+  <span class="dojohub-logo-text">LPTC DojoHub</span>
+  <img class="dojohub-logo-image" src="/static/images/logo.png">
+</span>
+<button class="dojohub-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
+  <i class="material-icons">more_vert</i>
+</button>
+<ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+  <li class="mdl-menu__item">Code Source</li>
+</ul>
+{{end}}

@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/golang/glog"
 	"github.com/spastorelli/dojohub/app/components"
+	"github.com/spastorelli/dojohub/app/handlers"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,11 +18,6 @@ var (
 	staticDir                      string
 	tlsCertFile, tlsPrivateKeyFile string
 )
-
-// TODO(spastorelli): Remove when actual handlers are implemented.
-func fakeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello There!")
-}
 
 // handleTermination handles gracefully the termination via SIGINT, SIGTERM of the server.
 func handleTermination() {
@@ -54,7 +49,8 @@ func main() {
 	handleTermination()
 
 	app := components.NewAppServer(&host, &port, &staticDir, &tlsCertFile, &tlsPrivateKeyFile)
-	app.RegisterHandler("/", http.HandlerFunc(fakeHandler))
+	app.RegisterHandler("/", http.HandlerFunc(handlers.Home))
+	app.RegisterHandler("/example/chat/", http.HandlerFunc(handlers.ExampleChat))
 
 	if err := app.Serve(); err != nil {
 		glog.Error("Error while starting the DojoHub: ", err)

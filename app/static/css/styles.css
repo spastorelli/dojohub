@@ -1,0 +1,416 @@
+/**
+ * Copyright 2015 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+body {
+  color: #757575;
+  font-family: 'Roboto', 'Helvetica','Arial',sans-serif;
+  margin: 0;
+}
+
+/* Disable ugly boxes around images in IE10 */
+a img{
+  border: 0px;
+}
+
+a {
+  color: #757575;
+}
+
+::-moz-selection {
+  background-color: #757575;
+  color: #fff;
+}
+
+::selection {
+  background-color: #757575;
+  color: #fff;
+}
+
+.dojohub-search-box .mdl-textfield__input {
+  color: #fff;
+}
+
+.dojohub-header .mdl-menu__container {
+  z-index: 50;
+  margin: 0 !important;
+}
+
+
+.mdl-textfield--expandable {
+  width: auto;
+}
+
+.dojohub-fab {
+  position: absolute;
+  right: 20%;
+  bottom: -26px;
+  z-index: 3;
+  background: #64ffda !important;
+  color: black !important;
+}
+
+.dojohub-mobile-title {
+  display: none !important;
+}
+
+
+.dojohub-logo-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+}
+
+.dojohub-logo-text {
+  color: #fff;
+}
+
+
+.dojohub-header {
+  overflow: visible;
+  background-color: #37474f;
+}
+
+  .dojohub-header .material-icons {
+    color: #fff !important;
+  }
+
+  .dojohub-header .mdl-layout__drawer-button {
+    background: transparent;
+    color: #767777;
+  }
+
+  .dojohub-header .mdl-navigation__link {
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+    .dojohub-header .mdl-navigation__link .material-icons {
+      margin-right: 5px;
+    }
+
+  .dojohub-navigation-container {
+    /* Simple hack to make the overflow happen to the left instead... */
+    direction: rtl;
+    -webkit-order: 1;
+        -ms-flex-order: 1;
+            order: 1;
+    width: 500px;
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dojohub-navigation {
+    /* ... and now make sure the content is actually LTR */
+    direction: ltr;
+    -webkit-justify-content: flex-end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
+    width: 800px;
+  }
+
+  .dojohub-search-box.is-focused + .dojohub-navigation-container {
+    opacity: 0;
+    width: 100px;
+  }
+
+
+  .dojohub-navigation .mdl-navigation__link {
+    display: inline-block;
+    height: 60px;
+    line-height: 68px;
+    background-color: transparent !important;
+    border-bottom: 4px solid transparent;
+  }
+
+    .dojohub-navigation .mdl-navigation__link:hover {
+      border-bottom: 4px solid #00bcd4;
+    }
+
+  .dojohub-search-box {
+    -webkit-order: 2;
+        -ms-flex-order: 2;
+            order: 2;
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .dojohub-more-button {
+    -webkit-order: 3;
+        -ms-flex-order: 3;
+            order: 3;
+  }
+
+
+.dojohub-drawer {
+  border-right: none;
+}
+
+  .dojohub-drawer-separator {
+    height: 1px;
+    background-color: #dcdcdc;
+    margin: 8px 0;
+  }
+
+  .dojohub-drawer .mdl-navigation__link.mdl-navigation__link {
+    font-size: 16px;
+    color: #37474f;
+  }
+
+  .dojohub-drawer span.mdl-navigation__link.mdl-navigation__link {
+    color: #00bcd4;
+  }
+
+  .dojohub-drawer .mdl-layout-title {
+    position: relative;
+    height: 64px;
+  }
+
+    .dojohub-drawer .dojohub-logo-text {
+      color: #37474f;
+      line-height: 60px;
+      margin-right: 5px;
+    }
+
+.dojohub-content.mdl-layout__content {
+  background-color: #efefef;
+}
+
+.logo-font {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1;
+  color: #767777;
+  font-weight: 500;
+}
+
+.dojohub-slogan {
+  font-size: 60px;
+  padding-top: 160px;
+}
+
+.dojohub-sub-slogan {
+  font-size: 21px;
+  padding-top: 24px;
+}
+
+.dojohub-screen-section {
+  position: relative;
+  padding-top: 60px;
+  padding-bottom: 80px;
+}
+
+.dojohub-screens {
+  text-align: right;
+  width: 100%;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.dojohub-screen {
+  text-align: center;
+}
+
+.dojohub-screen .dojohub-link {
+  margin-top: 16px;
+  display: block;
+  z-index: 2;
+}
+
+.dojohub-image-link {
+  text-decoration: none;
+}
+
+.dojohub-link {
+  text-decoration: none;
+  color: #00bcd4 !important;
+}
+
+  .dojohub-link:hover {
+    color: #00bcd4 !important;
+  }
+
+  .dojohub-link .material-icons {
+    position: relative;
+    top: -1px;
+    vertical-align: middle;
+  }
+
+.dojohub-alt-link {
+  text-decoration: none;
+  color: #64ffda !important;
+  font-size: 16px;
+}
+
+  .dojohub-alt-link:hover {
+    color: #00bfa5 !important;
+  }
+
+  .dojohub-alt-link .material-icons {
+    position: relative;
+    top: 6px;
+  }
+
+.dojohub-customized-section {
+  text-align: center;
+}
+
+.dojohub-customized-section-text {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 80px 16px 0 16px;
+}
+
+  .dojohub-customized-section-text p {
+    padding-top: 16px;
+  }
+
+.dojohub-customized-section-image {
+  background: url('images/devices.jpg') center top no-repeat;
+  background-size: cover;
+  height: 400px;
+}
+
+.dojohub-content-section {
+  padding: 45px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+  .dojohub-content-section .dojohub-section-title {
+    margin-left: 12px;
+    padding-bottom: 24px;
+  }
+
+.dojohub-card-container {
+  background-color: #fff;
+}
+
+  .dojohub-card-container .mdl-card__media {
+    overflow: hidden;
+    background-color: transparent;
+  }
+
+    .dojohub-card-container img {
+      display: block;
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+  .dojohub-card-container .mdl-card__title {
+    background: transparent;
+    height: auto;
+  }
+
+  .dojohub-card-container .mdl-card__title-text {
+    color: black;
+    height: auto;
+  }
+
+  .dojohub-card-container .mdl-card__supporting-text {
+    height: auto;
+    color: black;
+    padding-bottom: 56px;
+  }
+
+  .dojohub-card-container .mdl-card__actions {
+    position: absolute;
+    bottom: 0;
+  }
+
+  .dojohub-card-container .mdl-card__actions a {
+    border-top: none;
+    font-size: 16px;
+  }
+
+.dojohub-footer {
+  background-color: #fafafa;
+  position: relative;
+}
+
+  .dojohub-footer a:hover {
+    color: #757575;
+  }
+
+  .dojohub-footer .mdl-mini-footer--top-section::after {
+    border-bottom: none;
+  }
+
+  .dojohub-footer .mdl-mini-footer--middle-section::after {
+    border-bottom: none;
+  }
+
+  .dojohub-footer .mdl-mini-footer--bottom-section {
+    position: relative;
+  }
+
+  .dojohub-footer .mdl-mini-footer--bottom-section a {
+    margin-right: 2em;
+  }
+
+  .dojohub-footer .mdl-mini-footer--right-section a .material-icons {
+    position: relative;
+    top: 6px;
+  }
+
+
+.dojohub-link-menu:hover {
+  cursor: pointer;
+}
+
+
+/**** Mobile layout ****/
+@media (max-width: 900px) {
+  .dojohub-navigation-container {
+    display: none;
+  }
+
+  .dojohub-title {
+    display: none !important;
+  }
+
+  .dojohub-mobile-title {
+    display: block !important;
+    position: absolute;
+    left: calc(45% - 70px);
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* WebViews in iOS 9 break the "~" operator, and WebViews in OS X 10.10 break
+     consecutive "+" operators in some cases. Therefore, we need to use both
+     here to cover all the bases. */
+  .android.dojohub-search-box.is-focused ~ .dojohub-mobile-title,
+  .dojohub-search-box.is-focused + .dojohub-navigation-container + .dojohub-mobile-title {
+    opacity: 0;
+  }
+
+  .dojohub-more-button {
+    display: none;
+  }
+
+  .dojohub-search-box.is-focused {
+    width: calc(100% - 48px);
+  }
+
+  .dojohub-search-box .mdl-textfield__expandable-holder {
+    width: 100%;
+  }
+
+  .dojohub-footer .mdl-mini-footer--bottom-section {
+    display: none;
+  }
+}
