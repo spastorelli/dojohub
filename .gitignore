@@ -1,6 +1,7 @@
 \.*.swp
 \.DS_Store
 */**/coverage.out
+app/vendor/*/**
 data/**
 clients/lib/dist/**
 clients/lib/src/out/**

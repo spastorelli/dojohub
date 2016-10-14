@@ -1,0 +1,25 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "+al5Z5nU/8wGul4Yo9WHdL6WocE=",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "40bd0f3b4891a9d7f121bfb7b8e8b0525625e262",
+			"revisionTime": "2016-05-04T17:25:48Z"
+		},
+		{
+			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",
+			"path": "github.com/golang/glog",
+			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
+			"revisionTime": "2016-01-25T20:49:56Z"
+		},
+		{
+			"checksumSHA1": "UluBK/KntetOAdusj9Qamt8sFFg=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "1f512fc3f05332ba7117626cdfb4e07474e58e60",
+			"revisionTime": "2016-04-28T16:34:18Z"
+		}
+	],
+	"rootPath": "github.com/spastorelli/dojohub/app"
+}
