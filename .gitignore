@@ -1,8 +1,1 @@
-\.*.swp
-\.DS_Store
-*/**/coverage.out
-app/vendor/*/**
-data/**
-clients/lib/dist/**
-clients/lib/src/out/**
-clients/lib/node_modules/**
+.DS_Store

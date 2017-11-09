@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"github.com/golang/glog"
-	"github.com/spastorelli/dojohub/app/components"
-	"github.com/spastorelli/dojohub/app/handlers"
+	"github.com/spastorelli/dojohub/components"
+	"github.com/spastorelli/dojohub/handlers"
 	"net/http"
 	"os"
 	"os/signal"
