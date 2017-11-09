@@ -1,3 +1,4 @@
+{{ define "Base" }}
 <!doctype html>
 <!--
   Material Design Lite
@@ -15,34 +16,25 @@
   See the License for the specific language governing permissions and
   limitations under the License
 -->
-
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Introducing Lollipop, a sweet new take on Android.">
+    <meta name="description" content="LPTC CoderDojo DojoHub application">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="theme-name" content="#37474f">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="/static/images/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
-    <title>LPTC DojoHub</title>
+    <title>LPTC DojoHub - {{ template "Page" }}</title>
 
     <!-- Page styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
-    <style>
-    #view-source {
-      position: fixed;
-      display: block;
-      right: 0;
-      bottom: 0;
-      margin-right: 40px;
-      margin-bottom: 40px;
-      z-index: 900;
-    }
-    </style>
+    {{ template "CssIncludes" . }}
+    {{ template "JsIncludes" . }}
   </head>
   <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -64,7 +56,25 @@
             </div>
           </div>
           <!-- Navigation -->
-          {{ template "nav" . }}
+            <div class="dojohub-navigation-container">
+              <nav class="dojohub-navigation mdl-navigation">
+                <a class="mdl-navigation__link mdl-typography--text-uppercase" href="/">Home</a>
+                <a class="mdl-navigation__link mdl-typography--text-uppercase" href="http://lptcdojo.com">Dojo Website</a>
+                <a class="mdl-navigation__link mdl-typography--text-uppercase" href="/example/chat/">Examples</a>
+                <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Projects</a>
+              </nav>
+            </div>
+            <span class="dojohub-mobile-title mdl-layout-title">
+              <span class="dojohub-logo-text">LPTC DojoHub</span>
+              <img class="dojohub-logo-image" src="/static/images/logo.png">
+            </span>
+            <button class="dojohub-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
+              <i class="material-icons">more_vert</i>
+            </button>
+            <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+              <li class="mdl-menu__item">Code Source</li>
+            </ul>
+            <!-- End of Nav -->
         </div>
       </header>
       <!-- Drawer -->
@@ -73,12 +83,25 @@
           <span class="dojohub-logo-text">DojoHub</span>
           <img class="dojohub-logo-image" src="/static/images/logo.png" />
         </span>
-        {{ template "nav_drawer" . }}
+        <!-- NavDrawer -->
+        <nav class="mdl-navigation">
+          <a class="mdl-navigation__link" href="#"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
+          <a class="mdl-navigation__link" href="/example/chat/">Examples</a>
+          <a class="mdl-navigation__link" href="">Projects</a>
+
+          <div class="dojohub-drawer-separator"></div>
+
+          <span class="mdl-navigation__link" href="">Resources</span>
+          <a class="mdl-navigation__link" href="http://github.com/spastorelli/dojohub/">DojoHub Source</a>
+          <a class="mdl-navigation__link" href="http://lptcdojo.com">Dojo Website</a>
+        </nav>
+        <!-- End of NavDrawer -->
       </div>
       <!-- Content -->
       <div class="dojohub-content mdl-layout__content">
-        <a name="top"></a>
-        {{ template "content" . }}
+        <div class="dojohub-content-section">
+          {{ template "Content" . }}
+        </div>
       </div>
       <!-- Footer -->
       <footer class="dojohub-footer mdl-mini-footer">
@@ -94,3 +117,4 @@
     <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
   </body>
 </html>
+{{ end }}

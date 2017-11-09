@@ -93,8 +93,10 @@ ChatApp.prototype.onWsMessage_ = function(wsEvent) {
 ChatApp.prototype.updateChat_ = function(message, opt_incoming) {
     var incoming = (opt_incoming === undefined) ? true : opt_incoming;
     var msgClass = incoming ? 'chat-msg-in' : 'chat-msg-out';
-    var msgDom = $('<div class="' + msgClass + '">');
-    msgDom.text(message);
-    msgDom.appendTo(this.chatConvElem_);
+    var msgContainer = $('<span class="mdl-chip ' + msgClass + '">');
+    var msgChip = $('<span class="mdl-chip__text">');
+    msgChip.text(message);
+    msgChip.appendTo(msgContainer);
+    msgContainer.appendTo(this.chatConvElem_);
     this.chatConvElem_.scrollTop = this.chatConvElem_.scrollHeight;
 };

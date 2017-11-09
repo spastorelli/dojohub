@@ -1,6 +1,9 @@
 package handlers
 
-import "net/http"
+import (
+	"github.com/spastorelli/dojohub/app/template"
+	"net/http"
+)
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -8,5 +11,5 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	renderTemplate(w, "index", nil)
+	template.Render(w, "home.tmpl", nil)
 }
