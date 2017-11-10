@@ -49,9 +49,9 @@ func main() {
 	handleTermination()
 
 	chatExampleApp := components.NewApplication(
-		"<APP_ID>",
+		os.Getenv("APP_ID"),
 		"ChatExampleApp",
-		"<APP_SECRET>",
+		os.Getenv("APP_SECRET"),
 	)
 	msgHub := components.NewMsgHub()
 	msgHub.RegisterApplication(chatExampleApp)
