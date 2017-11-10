@@ -1,0 +1,16 @@
+{
+    "name": "LPTC DojoHub",
+    "description": "DojoHub for CoderDojo Leixlip collaborative activity",
+    "repository": "https://github.com/spastorelli/dojohub",
+    "keywords": ["coderdojo", "lptc"],
+    "env": {
+        "APP_ID": {
+            "description": "Application ID",
+            "required": true
+        },
+        "APP_SECRET": {
+            "description": "Application Secret",
+            "required": true
+        }
+    }
+}
