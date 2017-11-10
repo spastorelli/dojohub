@@ -1,1 +1,1 @@
-web: go run dojohub.go
+web: dojohub -port $PORT

@@ -34,7 +34,7 @@ func handleTermination() {
 
 func init() {
 	flag.IntVar(&port, "port", 8080, "HTTP server port")
-	flag.StringVar(&host, "host", "127.0.0.1", "HTTP server host")
+	flag.StringVar(&host, "host", "", "HTTP server host")
 	flag.StringVar(&staticDir, "staticDir", "static/", "The static files directories")
 	flag.StringVar(
 		&tlsCertFile, "tlsCertFile", "",
