@@ -1,6 +1,10 @@
 package components
 
 import (
+	"encoding/base64"
+	"github.com/dgrijalva/jwt-go"
+	"net/http"
+	"net/url"
 	"testing"
 )
 
@@ -105,5 +109,69 @@ func TestClientSendMessages(t *testing.T) {
 				"Message received (%v) does not match message sent (%v)",
 				actualMsgReceived, expectedMsgSent)
 		}
+	}
+}
+
+func createClientRequest(clientId, appId, secret string) (*http.Request, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims["aud"] = appId
+	token.Claims["sub"] = clientId
+
+	signedToken, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return nil, err
+	}
+
+	f := url.Values{}
+	f.Add("t", signedToken)
+	return &http.Request{
+		Method: "GET",
+		URL:    &url.URL{Path: "/ws"},
+		Form:   f,
+	}, nil
+}
+
+func TestClientValidation(t *testing.T) {
+	h := NewMsgHub()
+
+	// Register application
+	appId := "testAppID"
+	appName := "testAppName"
+	appSecret := "testAppSecret"
+	encSecret := base64.URLEncoding.EncodeToString([]byte(appSecret))
+	h.RegisterApplication(NewApplication(appId, appName, encSecret))
+
+	// Create a valid client
+	clientId := "testClientID"
+	validClientReq, err := createClientRequest(clientId, appId, appSecret)
+	if err != nil {
+		t.Fatalf("Error signing the Token: %v", err)
+	}
+
+	if !h.validateClient(validClientReq) {
+		t.Fatalf("Expected client to be valid.")
+	}
+
+	claimedClientId := validClientReq.Form.Get("cid")
+	if claimedClientId != clientId {
+		t.Fatalf(
+			"Client Id (%v) from claims does not match original Client Id (%v)",
+			claimedClientId, clientId)
+	}
+	claimedAppId := validClientReq.Form.Get("aid")
+	if claimedAppId != appId {
+		t.Fatalf(
+			"App Id (%v) from claims does not match original App Id (%v)",
+			claimedAppId, appId)
+	}
+
+	// Create an invalid client using a bad secret
+	invalidClientReq, err := createClientRequest("invalidClientID", appId, "badSecret")
+	if err != nil {
+		t.Fatalf("Error signing the Token: %v", err)
+	}
+
+	if h.validateClient(invalidClientReq) {
+		t.Fatalf("Expected client to be invalid.")
 	}
 }
