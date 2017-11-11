@@ -46,7 +46,8 @@ func (h *MsgHub) validationKey(token *jwt.Token) (key interface{}, err error) {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	}
 
-	claimedAppId, ok := token.Claims["aud"].(string)
+	claims := token.Claims.(jwt.MapClaims)
+	claimedAppId, ok := claims["aud"].(string)
 	if !ok {
 		return nil, fmt.Errorf("No Application Id found in the token claims.")
 	}
@@ -79,8 +80,9 @@ func (h *MsgHub) validateClient(r *http.Request) bool {
 	}
 
 	if parsedToken.Valid {
-		cId := parsedToken.Claims["sub"].(string)
-		appId := parsedToken.Claims["aud"].(string)
+		claims := parsedToken.Claims.(jwt.MapClaims)
+		cId := claims["sub"].(string)
+		appId := claims["aud"].(string)
 		// TODO(spastorelli): sub value has the format provider|user_id. Strip provider.
 		r.Form.Set("cid", cId)
 		r.Form.Set("aid", appId)

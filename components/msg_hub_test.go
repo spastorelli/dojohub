@@ -114,8 +114,9 @@ func TestClientSendMessages(t *testing.T) {
 
 func createClientRequest(clientId, appId, secret string) (*http.Request, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["aud"] = appId
-	token.Claims["sub"] = clientId
+	claims := token.Claims.(jwt.MapClaims)
+	claims["aud"] = appId
+	claims["sub"] = clientId
 
 	signedToken, err := token.SignedString([]byte(secret))
 	if err != nil {
