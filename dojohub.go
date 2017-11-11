@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"flag"
 	"github.com/golang/glog"
 	"github.com/spastorelli/dojohub/components"
@@ -48,10 +49,11 @@ func main() {
 	flag.Parse()
 	handleTermination()
 
+	encSecret := base64.URLEncoding.EncodeToString([]byte(os.Getenv("APP_SECRET")))
 	chatExampleApp := components.NewApplication(
 		os.Getenv("APP_ID"),
 		"ChatExampleApp",
-		os.Getenv("APP_SECRET"),
+		encSecret,
 	)
 	msgHub := components.NewMsgHub()
 	msgHub.RegisterApplication(chatExampleApp)
